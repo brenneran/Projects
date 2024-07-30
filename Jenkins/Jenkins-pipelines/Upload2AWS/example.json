@@ -1,0 +1,42 @@
+{
+  "BucketBasePaths": {
+    "Global": {
+      "basePath": "https://example-bucket.s3.amazonaws.com",
+      "ShouldUpload" : true
+    },
+    "China": {
+      "basePath": "https://china-bucket.s3.cn-north-1.amazonaws.com.cn",
+      "ShouldUpload" : true
+    }
+  },
+  "FilesToUpload": [
+    {
+      "Name": "UpgradeJsonForText",
+      "ShouldUpload": true,
+      "SourceType": "Artifactory",
+      "FullSourcePath": "https://example.com/file1.txt",
+      "destination": "download/Upgrades/1.11/file1.txt"
+    },
+    {
+      "Name": "UpgradeJson",
+      "ShouldUpload": true,
+      "SourceType": "Artifactory",
+      "FullSourcePath": "https://example.com/file2.json",
+      "destination": "download/Upgrades/file2.json"
+    },
+    {
+      "Name": "ExeInstaller",
+      "ShouldUpload": true,
+      "SourceType": "Artifactory",
+      "FullSourcePath": "https://example.com/example.exe",
+      "destination": "download/Upgrades/example.exe"
+    },
+    {
+      "Name": "StaticMap",
+      "ShouldUpload": true,
+      "SourceType": "Git",
+      "FullSourcePath": "https://example.com/file1.json",
+      "destination": "workdir/Download/file1.json"
+    }
+  ],
+  }
