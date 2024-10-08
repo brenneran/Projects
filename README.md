@@ -38,9 +38,15 @@ A project where I worked with the Vue.js framework to build an application for c
 - **Key Features:**
   - Modern front-end development with Vue.js
   - Dashboard for component versions system using Swagger API.
-  - 
 
-### 5. Python Projects
+### 5. Bash script for automating
+Bash script created for automate some tasks
+
+- **Folder:** [Vue.js](https://github.com/brenneran/Projects/tree/main/Bash)
+- **Key Features:**
+  - Automating process for some AWS tasks
+
+### 6. Python Projects
 A collection of Python projects that highlight my programming skills and ability to solve complex problems.
 
 - **Folder:** [Python Pension Calculator](https://github.com/brenneran/Projects/tree/main/Python/Invest%20Pension%20Calculator)
@@ -51,6 +57,6 @@ A collection of Python projects that highlight my programming skills and ability
 
 ## Contact
 
-Feel free to reach out to me via [LinkedIn](https://www.linkedin.com/in/brenneran/) or [email](mailto:andrey@brenner.space).
+Feel free to reach out to me via [LinkedIn](https://www.linkedin.com/in/brenneran/) or [email](mailto:0528805229m@gmail.com).
 
 Thank you for visiting my portfolio!
