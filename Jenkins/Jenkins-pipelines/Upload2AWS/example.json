@@ -38,5 +38,5 @@
       "FullSourcePath": "https://example.com/file1.json",
       "destination": "workdir/Download/file1.json"
     }
-  ],
+  ]
   }
