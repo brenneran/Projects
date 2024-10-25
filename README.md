@@ -22,14 +22,16 @@ In this project, I use Packer to create automated machine images for Linux and W
   - Integration with various cloud providers
   - Working with PowerShell, Bash, Groovy scripting.
 
-### 3. Jenkins Pipelines
+### 3. Jenkins Pipelines and Scripts
 This repository contains Jenkins pipeline scripts for CI/CD processes for automation and continuous delivery.
 
 - **Folder:** [Jenkins](https://github.com/brenneran/Projects/tree/main/Jenkins)
-- **Key Features:**
+  - **Key Features:**
   - Automated build to upload files to s3 with md5 hash validation, with different credentials and regions.
   - Error handling and retry mechanisms for robustness.
   - Retry logic and reports.
+- **Folder:** [CI-CD](https://github.com/brenneran/Projects/tree/main/CD-CD)
+  - **Key Features:**
 
 ### 4. Vue.js Framework Work
 A project where I worked with the Vue.js framework to build an application for components.
