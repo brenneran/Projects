@@ -27,3 +27,8 @@ This repository provides the Jenkins pipeline scripts and configurations needed 
 
 - After build is succeeded, open your webserver IP or URL with port :5000 that was exposed in Docker.
 
+## Python application of our Pension Calculator.
+
+- We deployed the Flask app with our Pension Calculator.
+- You can use any other application of Flask or other Frameworks by adding it to Docker file.
+
