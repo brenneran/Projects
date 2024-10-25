@@ -27,11 +27,12 @@ This repository contains Jenkins pipeline scripts for CI/CD processes for automa
 
 - **Folder:** [Jenkins](https://github.com/brenneran/Projects/tree/main/Jenkins)
   - **Key Features:**
-  - Automated build to upload files to s3 with md5 hash validation, with different credentials and regions.
-  - Error handling and retry mechanisms for robustness.
-  - Retry logic and reports.
+    - Automated build to upload files to s3 with md5 hash validation, with different credentials and regions.
+    - Error handling and retry mechanisms for robustness.
+    - Retry logic and reports.
 - **Folder:** [CI-CD](https://github.com/brenneran/Projects/tree/main/CD-CD)
   - **Key Features:**
+    - The full application deployment using Docker the Flask application with Jenkins Groovy.
 
 ### 4. Vue.js Framework Work
 A project where I worked with the Vue.js framework to build an application for components.
