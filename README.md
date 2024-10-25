@@ -45,7 +45,7 @@ A project where I worked with the Vue.js framework to build an application for c
 ### 5. Bash script for automating
 Bash script created for automate some tasks
 
-- **Folder:** [Vue.js](https://github.com/brenneran/Projects/tree/main/Bash)
+- **Folder:** [Bash](https://github.com/brenneran/Projects/tree/main/Bash)
 - **Key Features:**
   - Automating process for some AWS tasks
 
