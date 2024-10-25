@@ -10,8 +10,8 @@
 2. Navigate your Jenkins pipeline to the `Jenkinsfile` in this repository.
 
 3. Set up necessary credentials in Jenkins:
-   - **GitHub Credentials**: Create credentials for accessing this GitHub repository.
-   - **Docker Hub Credentials**: Create credentials for accessing Docker Hub.
+   - **GitHub Credentials**: Create credentials for accessing your GitHub repository. 
+   - **Docker Hub Credentials**: Create credentials for accessing Docker Hub. The credentials ID: **dockerhub-credentials**
 
 ## Usage
 
@@ -21,7 +21,7 @@ This repository provides the Jenkins pipeline scripts and configurations needed 
 
 - Jenkins server with docker plugin installed
 - Access to GitHub and Docker Hub accounts with appropriate credentials
-- Docker installed on the build environment if needed for Docker operations
+- Docker installed on the build environment if needed for Docker operations, or use Agents.
 
 ## Docker app access
 
