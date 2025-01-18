@@ -1,4 +1,4 @@
-@Library('Utils')
+@Library('my-shared-lib')
 import com.cloudbees.tools
 
 lib = new tools()
@@ -6,8 +6,7 @@ def ami_id = ''
 
 pipeline {
     agent {
-        //This label should be in Jenkins to be able build the packer. This agent should have packer installed onboard.
-        label 'linux-packer'
+        label 'linux'
     }
     parameters {
         //Remove this if you don't want autoupdate your AMI of some label in Jenkins
@@ -20,7 +19,7 @@ pipeline {
                     credentialsId: 'git_creds',
                     poll: false,
                     url: '{URL_2_YOUR_REPO}',
-                    branch: 'linux-ami-main'
+                    branch: 'linux-ami'
             }
         }
 
@@ -31,8 +30,8 @@ pipeline {
                                                      usernameVariable: 'AWS_ACCESS_KEY_ID'),]) {
                             script {
                                 sh '''
-                                packer init linux-ami-main.pkr.hcl
-                                packer build linux-ami-main.pkr.hcl -machine-readable | tee packer-output.txt
+                                packer init linux-ami.pkr.hcl
+                                packer build linux-ami.pkr.hcl -machine-readable | tee packer-output.txt
                                 '''
                                 def manifest = readJSON file: 'manifest.json'
                                 ami_id       = manifest.builds[0].artifact_id.split(':')[-1]
@@ -48,9 +47,8 @@ pipeline {
             steps {
                 script {
                     echo 'Updating image in account'
-                    lib.updateEC2cloudAMI   cloud: 'Atlas',
-                                            template: 'linux-ami-main',
-                                            ami: ami_id
+                    lib.updateEC2cloudAMI   cloud: 'ec2-agents',
+                                            template: 'linux-ami',
                 }
             }
         }
