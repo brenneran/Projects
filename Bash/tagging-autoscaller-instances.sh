@@ -31,7 +31,7 @@ tags=(
 )
 
 # Find all Auto Scaling Groups starting with 'eks-cloudbees-prod-mng-'
-asg_names=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, 'cloudbees-prod-mng-')].AutoScalingGroupName" --output text)
+asg_names=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, 'jenkins-mng-')].AutoScalingGroupName" --output text)
 
 # Iterate over each ASG to find the associated EC2 instance IDs
 for asg in $asg_names; do
