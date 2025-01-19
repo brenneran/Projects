@@ -1,0 +1,9 @@
+{
+ "remotes": [
+  {
+   "name": "repo",
+   "url": "https://repo.yourrepo.com/api",
+   "verify_ssl": true
+  }
+ ]
+}

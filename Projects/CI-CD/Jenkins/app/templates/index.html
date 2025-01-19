@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pension Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function toggleInflationRate() {
+            var checkBox = document.getElementById("inflationCheckbox");
+            var inflationRateInput = document.getElementById("inflationRateInput");
+            if (checkBox.checked) {
+                inflationRateInput.style.display = "block";
+            } else {
+                inflationRateInput.style.display = "none";
+            }
+        }
+
+
+// Function to clear the form fields, result, and table data
+function clearForm() {
+    document.getElementById("initial_investment").value = "";
+    document.getElementById("monthly_contribution").value = "";
+    document.getElementById("annual_interest_rate").value = "";
+    document.getElementById("compounding_frequency").value = "0"; // Set default value for select
+    document.getElementById("investment_period").value = "";
+    document.getElementById("inflation_rate").value = "";
+    
+    // Clear the result and other labels
+    document.getElementById("result").innerHTML = "";
+    if(document.getElementById("total_contributions")) {
+        document.getElementById("total_contributions").innerHTML = "";
+    }
+    if(document.getElementById("total_earned")) {
+        document.getElementById("total_earned").innerHTML = "";
+    }
+
+    // Clear the table
+    const tbody = document.querySelector("#data_table tbody");
+    if (tbody) {
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+    }
+
+    // Remove the canvas
+    var canvasContainer = document.querySelector(".chart-container");
+    var canvas = document.getElementById("pieChart");
+    if (canvas) {
+        canvasContainer.removeChild(canvas);
+    }
+}
+
+
+        // Ensure the inflation rate input is displayed if the checkbox is checked
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleInflationRate();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Pension Calculator</h1>
+            <form method="POST">
+                <!-- Form inputs -->
+                <label for="initial_investment" class="input-label">Initial Investment Amount ($):</label>
+                <input type="number" id="initial_investment" name="initial_investment" step="0.01" value="{{ request.form['initial_investment'] if 'initial_investment' in request.form else '' }}" autocomplete="off" class="input-field">
+                
+                <label for="monthly_contribution" class="input-label">Monthly Contribution Amount ($) (optional):</label>
+                <input type="number" id="monthly_contribution" name="monthly_contribution" step="0.01" value="{{ request.form['monthly_contribution'] if 'monthly_contribution' in request.form else '' }}" autocomplete="off" class="input-field">
+                
+                <label for="annual_interest_rate" class="input-label">Annual Interest Rate (%):</label>
+                <input type="number" id="annual_interest_rate" name="annual_interest_rate" step="0.01" required value="{{ request.form['annual_interest_rate'] if 'annual_interest_rate' in request.form else '' }}" autocomplete="off" class="input-field">
+                <span id="interest_rate_error" class="error-message" style="display:none;">Annual interest rate must be greater than 0.</span>
+                
+                <label for="compounding_frequency" class="input-label">Compounding Frequency per Year:</label>
+                <select id="compounding_frequency" name="compounding_frequency" class="input-field">
+                    <option value="0" {{ 'selected' if 'compounding_frequency' in request.form and request.form['compounding_frequency'] == '0' else '' }}>No reinvest</option>
+                    <option value="2" {{ 'selected' if 'compounding_frequency' in request.form and request.form['compounding_frequency'] == '2' else '' }}>Once every half year</option>
+                    <option value="12" {{ 'selected' if 'compounding_frequency' in request.form and request.form['compounding_frequency'] == '12' else '' }}>Once every month</option>
+                    <option value="1" {{ 'selected' if 'compounding_frequency' in request.form and request.form['compounding_frequency'] == '1' else '' }}>Once every year</option>
+                </select>
+                
+                <label for="investment_period" class="input-label">Investment Period (years):</label>
+                <input type="number" id="investment_period" name="investment_period" step="1" value="{{ request.form['investment_period'] if 'investment_period' in request.form else '' }}" autocomplete="off" class="input-field">
+
+                
+                <div class="checkbox-container">
+    <input class="checkbox-label" type="checkbox" id="inflationCheckbox" name="inflation_adjustment" onclick="toggleInflationRate()" {{ 'checked' if 'inflation_adjustment' in request.form else '' }}>
+    <label class="checkbox-label" for="inflationCheckbox">Adjust for Inflation</label>
+</div>
+
+                <div id="inflationRateInput" style="display: {{ 'block' if 'inflation_adjustment' in request.form else 'none' }};">
+                    <label for="inflation_rate" class="input-label">Expected Yearly Inflation Rate (%) (optional):</label>
+                    <input type="number" id="inflation_rate" name="inflation_rate" step="0.01" value="{{ request.form['inflation_rate'] if 'inflation_rate' in request.form else '' }}" autocomplete="off" class="input-field">
+                </div>
+                
+                <input type="submit" value="Calculate">
+                <input type="button" value="Clear" class="clear-button" onclick="clearForm()">
+            </form>
+            <div class="label-container">
+                {% if result %}
+                <p><span class="total-value-result" id="result">{{ result|safe }}</span></p>
+                    {% if total_contributions %}
+                    <p id="total_contributions"><span class="total-label">Total Contributions:</span> <span class="total-value">{{ total_contributions }}</span></p>
+                    {% endif %}
+                    {% if total_earned %}
+                    <p id="total_earned"><span class="total-label">Total Earnings:</span> <span class="total-value"> {{ total_earned }}</span></p>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="chart-container">
+                <canvas id="pieChart" style="box-sizing: border-box;"></canvas>
+            </div>
+            <div class="table-container">
+                {% if table_data %}
+                    <table id="data_table">
+                        <tr>
+                            <th>Year</th>
+                            <th>Starting Sum</th>
+                            <th>Income Invested</th>
+                            <th>Invested</th>
+                            <th>Final Sum</th>
+                        </tr>
+                        {% for row in table_data %}
+                            <tr>
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{ row[2] }}</td>
+                                <td>{{ row[3] }}</td>
+                                <td>{{ row[4] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        // Pie chart
+        document.addEventListener("DOMContentLoaded", function() {
+            var pieData = {{ pie_data|safe }};
+            var ctx = document.getElementById('pieChart').getContext('2d');
+            if (pieData.labels.length > 0 && pieData.data.length > 0) {
+                window.pieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: pieData.labels,
+                        datasets: [{
+                            data: pieData.data,
+                            backgroundColor: pieData.backgroundColor,
+                            borderColor: pieData.borderColor,
+                            borderWidth: pieData.borderWidth
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

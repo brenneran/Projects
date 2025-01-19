@@ -1,0 +1,27 @@
+#!/bin/bash
+set -x
+set -e
+sleep 60
+
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+ulimit -n 65535
+
+%{ for disk in disks ~}
+echo "Start preparing disk for ${disk.name}"
+while [ ! -e ${disk.device} ]
+do
+  echo "Waiting for ${disk.name} to become availeble"
+  sleep 5
+done
+pvcreate ${disk.device}
+vgcreate vg_${disk.name} ${disk.device}
+lvcreate -l 100%FREE -n lv_${disk.name} vg_${disk.name}
+mkfs.${disk.fs} -L ${disk.name} /dev/vg_${disk.name}/lv_${disk.name}
+mkdir -p ${disk.mount}
+mount -t ${disk.fs} /dev/vg_${disk.name}/lv_${disk.name} ${disk.mount}
+echo "Done preparing disk for ${disk.name}"
+sleep 10
+%{ endfor ~}
+
+curl -sSL "https://get.replicated.com/docker?replicated_tag=2.53.2&replicated_ui_tag=2.53.2&replicated_operator_tag=2.53.2" | sudo bash -s no-auto
+
