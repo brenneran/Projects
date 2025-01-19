@@ -1,0 +1,2 @@
+yourrepo https://repo.yourrepo.com/api/conan/conan-thirdparty True
+conan-bld https://repo.yourrepo.com/artifactory/api/conan True

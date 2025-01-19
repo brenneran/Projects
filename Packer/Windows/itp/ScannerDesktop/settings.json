@@ -1,0 +1,16 @@
+{
+  "RegistrationSettingsGroup": {
+    "ExportDomain": {
+      "Constraints": "",
+      "Description": "",
+      "Value": "https://example.com/",
+      "DefaultValue": "https://example.com/"
+    },
+    "MATDomain": {
+      "Constraints": "",
+      "Description": "",
+      "Value": "https://example.com/",
+      "DefaultValue": "https://example.com/"
+    }
+  }
+}
