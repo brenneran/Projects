@@ -58,8 +58,14 @@ A collection of Python projects that highlight my programming skills and ability
   - Using Flask framework to access as a website.
   - Style CSS and HTML was used in this project.
  
-  ### 7. Android app  
-A new project of Android App
+### 7. Android app
+A new project of Android App with deployment on GitHub Action to the Telegram Groups with Telegram bot
+
+- **Folder:** [Android App](https://github.com/brenneran/Projects/tree/main/Android%20app)
+- **Key Features:**
+  - Building first simple Android App with keystore and versioning
+  - Build and Deployments with GitHub Action
+  - Deploying artifact to GitHub and pushing it to Telegram using Telegram Bot
 
 ## Contact
 
