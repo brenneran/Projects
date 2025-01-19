@@ -47,7 +47,7 @@ export default {
             return this.selectedFruits.length > 0
         },
         title() {
-            if (this.likesAllFruit) return 'Holy smokes, someone call the iTero police!'
+            if (this.likesAllFruit) return 'Holy smokes, someone call the police!'
 
             if (this.likesSomeFruit) return 'Components Selected'
 

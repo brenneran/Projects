@@ -27,7 +27,7 @@ The following tools are installed as part of this Packer image:
 - Intel Compiler 2023 and 2022 (2022 with integration to VS2017 and 2023 with integration to VS2022)
 - PowerShell version 7.4.0
 - Installation and registration of Amazon CloudHSM
-- Adding Align certificate to Root CA
+- Adding certificate to Root CA
 - Enabling Wireless-Networking
 - Creating a task for lunchjnlp.bat
 - Adding required Bamboo variables

@@ -17,7 +17,7 @@ animals=(
 # Randomly select an animal from the list
 random_animal=${animals[RANDOM % ${#animals[@]}]}
 
-# Construct the tags with a unique Value for align.itero.name
+# Construct the tags with a unique Value for
 tags=(
   "Key=Owner,Value=devops/department-name"
   "Key=Role,Value=eks/compute"

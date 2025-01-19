@@ -1,4 +1,4 @@
-@Library('Utils')
+@Library('my-shared-lib')
 import com.cd.cd_utils
 lib = new cd_utils()
 import com.cloudbees.tools

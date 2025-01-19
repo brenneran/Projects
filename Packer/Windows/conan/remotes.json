@@ -1,8 +1,8 @@
 {
  "remotes": [
   {
-   "name": "align",
-   "url": "https://repo.aligntech.com/api/conan/conan-thirdparty",
+   "name": "repo",
+   "url": "https://repo.yourrepo.com/api",
    "verify_ssl": true
   }
  ]

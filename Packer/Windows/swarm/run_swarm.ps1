@@ -17,7 +17,7 @@ if ($jsonContent.PSObject.Properties.Name -contains "labels") {
 	# Retrieve 'label' value from the dictionary
     $labelValue = $jsonContent.labels
     # Run the Jenkins swarm client with the specified parameters, including the retrieved labels
-    Java -jar $workDir\swarm-client.jar -master https://your_jenkins.com -webSocket -username svc.auto_user  -password $token -mode exclusive -fsroot $workDir -deleteExistingClients -name shield_vm -labels $labelValue -executors 1 
+    Java -jar $workDir\swarm-client.jar -master https://your_jenkins.com -webSocket -username user  -password $token -mode exclusive -fsroot $workDir -deleteExistingClients -name shield_vm -labels $labelValue -executors 1 
 } else {
     # If the 'labels' property is not found, create an empty text file in the working directory
 	New-Item -Path $workDir -Name "UserDataEmpty.txt" -ItemType File

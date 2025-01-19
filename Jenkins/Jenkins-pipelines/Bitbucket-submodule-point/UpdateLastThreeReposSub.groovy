@@ -1,5 +1,7 @@
-@Library("Utils")
+@Library("my-shared-lib")
 import groovy.json.JsonSlurperClassic
+
+//replaceme is what you need to replace
 
 pipeline {
     agent { label 'linux-ami-main-build' }
@@ -30,9 +32,9 @@ pipeline {
         stage('Fetch Last Three Branches of NG Repo') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
-                        def ngRepoUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.NG_REPO}/branches"
+                        def ngRepoUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'yourproject'}/repos/${env.NG_REPO}/branches"
                         def response = httpRequest(
                             url: "${ngRepoUrl}?limit=100",
                             customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -74,15 +76,15 @@ pipeline {
             }
         }
 
-        stage('Pull iTeroRTH branch from Combo Var file') {
+        stage('Pull replacemeRTH branch from Combo Var file') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'your-username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
-                        def branchToIteroRTHMap = [:]
+                        def branchToreplacemeRTHMap = [:]
                         env.LAST_THREE_BRANCHES.split(',').each { ngBranch ->
                             echo "Fetching combo_variables_input.txt for branch: ${ngBranch}"
-                            def fileUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.NG_REPO}/raw/combo_variables_input.txt?at=${ngBranch}"
+                            def fileUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.NG_REPO}/raw/combo_variables_input.txt?at=${ngBranch}"
                             def fileResponse = httpRequest(
                                 url: fileUrl,
                                 customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -93,30 +95,30 @@ pipeline {
                             def rthSubmoduleLine = comboVariables.find { it.trim().startsWith("rth_submodule=") } // Find the line with "rth_submodule="
                             if (rthSubmoduleLine) {
                                 def version = rthSubmoduleLine.replace("rth_submodule=", "").trim() // Extract the version
-                                branchToIteroRTHMap[ngBranch] = "${env.RELEASE}/iTeroRTH-${version}"
-                                echo "Mapped NG branch '${ngBranch}' to iTeroRTH branch: ${env.RELEASE}/iTeroRTH-${version}"
+                                branchToreplacemeRTHMap[ngBranch] = "${env.RELEASE}/replacemeRTH-${version}"
+                                echo "Mapped NG branch '${ngBranch}' to replacemeRTH branch: ${env.RELEASE}/replacemeRTH-${version}"
                             } else {
                                 echo "No rth_submodule version found in combo_variables_input.txt for branch ${ngBranch}"
                             }
                         }
-                        env.BRANCH_TO_ITERORTH_MAP = new groovy.json.JsonBuilder(branchToIteroRTHMap).toString()
-                        echo "Branch to iTeroRTH map: ${branchToIteroRTHMap}"
-                        env.TARGET_BRANCHES = branchToIteroRTHMap.values().join(',')
+                        env.BRANCH_TO_replacemeRTH_MAP = new groovy.json.JsonBuilder(branchToreplacemeRTHMap).toString()
+                        echo "Branch to replacemeRTH map: ${branchToreplacemeRTHMap}"
+                        env.TARGET_BRANCHES = branchToreplacemeRTHMap.values().join(',')
                         echo "TARGET_BRANCHES set to: ${env.TARGET_BRANCHES}"
                     }
                 }
             }
         }
 
-        stage('Fetch Submodule Commit of iTeroRTH for NG Branches') {
+        stage('Fetch Submodule Commit of replacemeRTH for NG Branches') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'your-username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
                         def lastThreeBranches = env.LAST_THREE_BRANCHES.split(',')
                         lastThreeBranches.each { ngBranch ->
-                            echo "Fetching submodule commit for iTeroRTH in NG branch: ${ngBranch}"
-                            def submoduleCommitUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.NG_REPO}/browse?at=${ngBranch}&path=iTeroRTH"
+                            echo "Fetching submodule commit for replacemeRTH in NG branch: ${ngBranch}"
+                            def submoduleCommitUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.NG_REPO}/browse?at=${ngBranch}&path=replacemeRTH"
                             def submoduleResponse = httpRequest(
                                 url: submoduleCommitUrl,
                                 customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -124,16 +126,16 @@ pipeline {
                                 consoleLogResponseBody: true
                             )
                             def submoduleJson = new JsonSlurperClassic().parseText(submoduleResponse.content)
-                            def iTeroRTHEntry = submoduleJson.children.values.find {
-                                it.path.components == ['iTeroRTH'] && it.type == 'SUBMODULE'
+                            def replacemeRTHEntry = submoduleJson.children.values.find {
+                                it.path.components == ['replacemeRTH'] && it.type == 'SUBMODULE'
                             }
         
-                            if (iTeroRTHEntry) {
-                                def submoduleCommitHash = iTeroRTHEntry.contentId
-                                echo "iTeroRTH submodule commit for NG branch ${ngBranch}: ${submoduleCommitHash}"s
+                            if (replacemeRTHEntry) {
+                                def submoduleCommitHash = replacemeRTHEntry.contentId
+                                echo "replacemeRTH submodule commit for NG branch ${ngBranch}: ${submoduleCommitHash}"s
                                 env."COMMIT_HASH_${ngBranch}" = submoduleCommitHash
                             } else {
-                                echo "No iTeroRTH submodule entry found for NG branch ${ngBranch}"
+                                echo "No replacemeRTH submodule entry found for NG branch ${ngBranch}"
                             }
                         }
                     }
@@ -141,10 +143,10 @@ pipeline {
             }
         }
 
-        stage('Pull the TAG and Last Commit of iTeroRTH') {
+        stage('Pull the TAG and Last Commit of replacemeRTH') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'your-username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
         
                         // Ensure TARGET_BRANCHES is defined
@@ -155,8 +157,8 @@ pipeline {
                         def targetBranches = env.TARGET_BRANCHES.split(',') // Split branches into a list
                         echo "Processing the following branches: ${targetBranches.join(', ')}"
         
-                        def branchBaseUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.RTH_REPO}/branches"
-                        def tagUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.RTH_REPO}/tags"
+                        def branchBaseUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.RTH_REPO}/branches"
+                        def tagUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.RTH_REPO}/tags"
                         
                         targetBranches.each { branchName ->
                             echo "Fetching details for branch: ${branchName}"
@@ -190,7 +192,7 @@ pipeline {
                             def isLastPage = false
         
                             while (!isLastPage) {
-                                def paginatedUrl = "${tagUrl}?filterText=iTeroRTH-&limit=25&start=${start}"
+                                def paginatedUrl = "${tagUrl}?filterText=replacemeRTH-&limit=25&start=${start}"
                                 def tagResponse = httpRequest(
                                     url: paginatedUrl,
                                     customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -241,7 +243,7 @@ pipeline {
         stage('Verify and Determine Next Action') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'your-username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
                         def updateMap = [:]
                         def updateRequired = false
@@ -255,13 +257,13 @@ pipeline {
                                 return
                             }
 
-                            def iTeroRTHBranch = new JsonSlurperClassic().parseText(env.BRANCH_TO_ITERORTH_MAP)[ngBranch]
-                            if (!iTeroRTHBranch) {
-                                echo "No iTeroRTH branch mapping found for NG branch: ${ngBranch}. Skipping."
+                            def replacemeRTHBranch = new JsonSlurperClassic().parseText(env.BRANCH_TO_replacemeRTH_MAP)[ngBranch]
+                            if (!replacemeRTHBranch) {
+                                echo "No replacemeRTH branch mapping found for NG branch: ${ngBranch}. Skipping."
                                 return
                             }
 
-                            def branchUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.RTH_REPO}/branches?filterText=${iTeroRTHBranch}&limit=1"
+                            def branchUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.RTH_REPO}/branches?filterText=${replacemeRTHBranch}&limit=1"
                             def branchResponse = httpRequest(
                                 url: branchUrl,
                                 customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -270,13 +272,13 @@ pipeline {
 
                             def branchDetails = new JsonSlurperClassic().parseText(branchResponse.content)?.values ?: []
                             if (branchDetails.isEmpty()) {
-                                echo "Branch ${iTeroRTHBranch} not found. Skipping."
+                                echo "Branch ${replacemeRTHBranch} not found. Skipping."
                                 return
                             }
 
                             def latestCommit = branchDetails[0]?.latestCommit
                             if (!latestCommit) {
-                                echo "No latest commit found for branch: ${iTeroRTHBranch}. Skipping update check for ${ngBranch}."
+                                echo "No latest commit found for branch: ${replacemeRTHBranch}. Skipping update check for ${ngBranch}."
                                 return
                             }
 
@@ -295,7 +297,7 @@ pipeline {
         stage('Prepare BRANCH_TAG_MAP') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'ad-svc.iterodevops', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'your-username', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                         def authString = "${USER}:${PASSWORD}".getBytes('iso-8859-1').encodeBase64().toString()
                         def branchTagMap = [:]
                         def targetBranches = env.LAST_THREE_BRANCHES.split(',')
@@ -303,16 +305,16 @@ pipeline {
                         targetBranches.each { ngBranch ->
                             echo "Processing NG branch: ${ngBranch}"
         
-                            // Map NG branch to its corresponding iTeroRTH branch
-                            def iTeroRTHBranch = new JsonSlurperClassic().parseText(env.BRANCH_TO_ITERORTH_MAP)[ngBranch]
-                            if (!iTeroRTHBranch) {
-                                echo "No iTeroRTH branch mapping found for NG branch: ${ngBranch}. Skipping."
+                            // Map NG branch to its corresponding replacemeRTH branch
+                            def replacemeRTHBranch = new JsonSlurperClassic().parseText(env.BRANCH_TO_replacemeRTH_MAP)[ngBranch]
+                            if (!replacemeRTHBranch) {
+                                echo "No replacemeRTH branch mapping found for NG branch: ${ngBranch}. Skipping."
                                 return
                             }
                             
-                            // Fetch the last commit of the mapped iTeroRTH branch
-                            def branchBaseUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.RTH_REPO}/branches"
-                            def branchUrl = "${branchBaseUrl}?filterText=${iTeroRTHBranch}&limit=1"
+                            // Fetch the last commit of the mapped replacemeRTH branch
+                            def branchBaseUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.RTH_REPO}/branches"
+                            def branchUrl = "${branchBaseUrl}?filterText=${replacemeRTHBranch}&limit=1"
                             
                             def branchResponse = httpRequest(
                                 url: branchUrl,
@@ -322,21 +324,21 @@ pipeline {
                             
                             def branchJson = new JsonSlurperClassic().parseText(branchResponse.content)
                             if (!branchJson.values || branchJson.values.isEmpty()) {
-                                echo "No details found for branch: ${iTeroRTHBranch}. Skipping."
+                                echo "No details found for branch: ${replacemeRTHBranch}. Skipping."
                                 return
                             }
         
                             def latestCommit = branchJson.values[0].latestCommit
-                            echo "Latest commit for branch ${iTeroRTHBranch}: ${latestCommit}"
+                            echo "Latest commit for branch ${replacemeRTHBranch}: ${latestCommit}"
         
                             // Fetch tags for the latest commit
-                            def tagUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'itero'}/repos/${env.RTH_REPO}/tags"
+                            def tagUrl = "${BITBUCKET_API_BASE_URL}/${params.TESTING ? 'ido' : 'replaceme'}/repos/${env.RTH_REPO}/tags"
                             def matchingTags = []
                             def start = 0
                             def isLastPage = false
         
                             while (!isLastPage) {
-                                def paginatedUrl = "${tagUrl}?filterText=iTeroRTH-&limit=25&start=${start}"
+                                def paginatedUrl = "${tagUrl}?filterText=replacemeRTH-&limit=25&start=${start}"
                                 def tagResponse = httpRequest(
                                     url: paginatedUrl,
                                     customHeaders: [[name: 'Authorization', value: "Basic ${authString}"]],
@@ -356,10 +358,10 @@ pipeline {
                             }
         
                             if (matchingTags.isEmpty()) {
-                                echo "No tags found for the latest commit of branch: ${iTeroRTHBranch}. Proceeding without a tag."
+                                echo "No tags found for the latest commit of branch: ${replacemeRTHBranch}. Proceeding without a tag."
                             } else {
                                 def latestTag = matchingTags[-1] // Assume the last tag is the most relevant
-                                echo "Latest tag for ${iTeroRTHBranch}: ${latestTag.displayId}"
+                                echo "Latest tag for ${replacemeRTHBranch}: ${latestTag.displayId}"
                                 branchTagMap[ngBranch] = latestTag.displayId
                             }
                         }
@@ -380,39 +382,39 @@ pipeline {
                 script {
                     def updateMap = new JsonSlurperClassic().parseText(env.UPDATE_MAP)
                     def branchTagMap = new JsonSlurperClassic().parseText(env.BRANCH_TAG_MAP)
-                    def branchToIteroMap = new JsonSlurperClassic().parseText(env.BRANCH_TO_ITERORTH_MAP)
+                    def branchToreplacemeMap = new JsonSlurperClassic().parseText(env.BRANCH_TO_replacemeRTH_MAP)
         
                     env.LAST_THREE_BRANCHES.split(',').each { ngBranch ->
                         if (updateMap[ngBranch]) {
-                            def tagVersion = branchTagMap[ngBranch]?.replace("iTeroRTH-", "")
+                            def tagVersion = branchTagMap[ngBranch]?.replace("replacemeRTH-", "")
                             if (!tagVersion) {
                                 echo "No tag version found for ${ngBranch}. Skipping update."
                                 return
                             }
 
-                            def iTeroRTHBranch = branchToIteroMap[ngBranch]
-                            if (!iTeroRTHBranch) {
-                                echo "No mapped iTeroRTH branch for NG branch: ${ngBranch}. Skipping update."
+                            def replacemeRTHBranch = branchToreplacemeMap[ngBranch]
+                            if (!replacemeRTHBranch) {
+                                echo "No mapped replacemeRTH branch for NG branch: ${ngBranch}. Skipping update."
                                 return
                             }
         
-                            sshagent(credentials: ['ad-svc.iterodevops-ssh']) {
+                            sshagent(credentials: ['your-username-ssh']) {
                                 sh """
                                     # Clone NG repository
                                     rm -rf ${env.WORKSPACE}/${env.BUILD_TAG}/${env.NG_REPO}
                                     mkdir -p ${env.WORKSPACE}/${env.BUILD_TAG}
                                     cd ${env.WORKSPACE}/${env.BUILD_TAG}
-                                    git clone --branch ${ngBranch} --single-branch ssh://git@src.aligntech.com/${params.TESTING ? 'ido' : 'itero'}/${env.NG_REPO}.git
+                                    git clone --branch ${ngBranch} --single-branch ssh://git@src.aligntech.com/${params.TESTING ? 'ido' : 'replaceme'}/${env.NG_REPO}.git
                                     cd ${env.NG_REPO}
                                     
                                     # Update submodule
-                                    git submodule update --init iTeroRTH
-                                    cd iTeroRTH
-                                    git fetch origin ${iTeroRTHBranch}
+                                    git submodule update --init replacemeRTH
+                                    cd replacemeRTH
+                                    git fetch origin ${replacemeRTHBranch}
                                     git checkout FETCH_HEAD
                                     cd ..
-                                    git add iTeroRTH
-                                    git commit -m "Update iTeroRTH submodule to branch ${iTeroRTHBranch}"
+                                    git add replacemeRTH
+                                    git commit -m "Update replacemeRTH submodule to branch ${replacemeRTHBranch}"
                                     
                                     # Update combo_variables.txt
                                     echo "rth_submodule=${tagVersion}" > combo_variables.txt
@@ -423,7 +425,7 @@ pipeline {
                                     git push origin ${ngBranch}
                                 """
                             }
-                            echo "Updated NG branch: ${ngBranch} with tag: ${tagVersion} and submodule pointing to branch: ${iTeroRTHBranch}."
+                            echo "Updated NG branch: ${ngBranch} with tag: ${tagVersion} and submodule pointing to branch: ${replacemeRTHBranch}."
                         } else {
                             echo "No update required for NG branch: ${ngBranch}."
                         }
