@@ -61,7 +61,7 @@ A collection of Python projects that highlight my programming skills and ability
 ### 7. Android app
 A new project of Android App with deployment on GitHub Action to the Telegram Groups with Telegram bot
 
-- **Folder:** [Android App](https://github.com/brenneran/Projects/tree/main/Android%20app)
+- **Folder:** [Android App](https://github.com/brenneran/Projects/tree/main/Android)
 - **Key Features:**
   - Building first simple Android App with keystore and versioning
   - Build and Deployments with GitHub Action
