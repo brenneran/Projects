@@ -59,7 +59,7 @@ A collection of Python projects that highlight my programming skills and ability
   - Style CSS and HTML was used in this project.
 
   ### 7. Android app
-
+A new project of Android App
 
 ## Contact
 
